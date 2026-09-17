@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo de números</title>
+  <style>
+    :root {
+      --bg: #07111b;
+      --bg-2: #0b1c2e;
+      --panel: rgba(17, 27, 40, 0.85);
+      --panel-strong: rgba(12, 20, 31, 0.96);
+      --gold: #f7d57a;
+      --gold-2: #d9a93a;
+      --primary: #3ee0a3;
+      --primary-dark: #1bbd86;
+      --accent: #5bb3ff;
+      --accent-2: #8cc8ff;
+      --text: #eef6ff;
+      --muted: #a9bad6;
+      --danger: #ff6b6b;
+      --danger-dark: #e24c4c;
+      --shadow: 0 20px 45px rgba(4, 9, 16, 0.5);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(91, 179, 255, 0.18), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(62, 224, 163, 0.12), transparent 25%),
+        linear-gradient(135deg, var(--bg-2) 0%, var(--bg) 55%, #040a12 100%);
+      color: var(--text);
+      padding: 30px 18px 60px;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+    .page-header { text-align: center; margin-bottom: 20px; }
+    .mini-tag {
+      display: inline-block;
+      background: rgba(62, 224, 163, 0.12);
+      color: var(--primary);
+      border: 1px solid rgba(62, 224, 163, 0.3);
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2.1rem, 4vw, 3.3rem);
+      color: var(--gold);
+      letter-spacing: 1px;
+      text-shadow: 0 2px 12px rgba(247, 213, 122, 0.25);
+    }
+    .subtitle {
+      margin: 12px auto 0;
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 720px;
+      line-height: 1.5;
+    }
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 22px auto 18px;
+      max-width: 1000px;
+      background: rgba(16, 27, 45, 0.78);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .buscador {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+    .buscador input {
+      flex: 1 1 260px;
+      min-width: 220px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(12, 22, 39, 0.96);
+      color: var(--text);
+      border-radius: 12px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .buscador input:focus,
+    .form-whatsapp input:focus,
+    .creator input:focus {
+      border-color: rgba(91, 179, 255, 0.8);
+      box-shadow: 0 0 0 3px rgba(91, 179, 255, 0.12);
+      outline: none;
+    }
+    .precio-numero {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.9);
+      margin-top: 4px;
+      letter-spacing: 0.03em;
+    }
+    .buscador button,
+    .carrito button,
+    .creator button {
+      padding: 14px 22px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    }
+    .buscador button:hover,
+    .carrito button:hover,
+    .creator button:hover,
+    .numero-boton:hover { transform: translateY(-2px); }
+    .buscador button {
+      background: linear-gradient(135deg, var(--gold), var(--gold-2));
+      color: #1d180d;
+      box-shadow: 0 10px 22px rgba(247, 213, 122, 0.22);
+    }
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(290px, 360px);
+      gap: 20px;
+      margin-top: 20px;
+      align-items: start;
+    }
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+      gap: 10px;
+      max-height: 75vh;
+      overflow-y: auto;
+      background: rgba(15, 22, 34, 0.8);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .numero-boton {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, #152a41, #0d1b2b);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 1.08rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    .numero-boton.disponible {
+      background: linear-gradient(135deg, #1ecf87, #169e6f);
+      color: #041b13;
+      border-color: rgba(30, 207, 135, 0.5);
+      font-weight: 800;
+    }
+    .numero-boton.selected {
+      background: linear-gradient(135deg, #8ad8ff, #69aefc);
+      color: #0a1f32;
+      border-color: rgba(138, 216, 255, 0.8);
+      font-weight: 800;
+      box-shadow: 0 0 0 2px rgba(138, 216, 255, 0.28);
+    }
+    .numero-boton.vendido {
+      background: linear-gradient(180deg, #491d1d, #2d1010);
+      color: #ffc2c2;
+      border-color: rgba(255, 107, 107, 0.4);
+      text-decoration: line-through;
+      text-decoration-thickness: 3px;
+      opacity: 0.8;
+    }
+    .carrito,
+    .creator {
+      background: rgba(16, 27, 45, 0.82);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .carrito {
+      position: sticky;
+      top: 18px;
+      z-index: 20;
+      backdrop-filter: blur(10px);
+    }
+    .carrito-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .carrito h2,
+    .creator h2 {
+      margin: 0;
+      color: var(--gold);
+      font-size: 1.2rem;
+    }
+    .cart-count {
+      background: rgba(91, 179, 255, 0.12);
+      color: var(--accent-2);
+      border: 1px solid rgba(91, 179, 255, 0.25);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .carrito-lista {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .carrito-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.03);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.05);
+      font-weight: 700;
+    }
+    .carrito-total {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 800;
+      color: var(--gold);
+    }
+    .carrito-item button {
+      background: transparent;
+      color: var(--danger);
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+    .carrito button {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #061712;
+      box-shadow: 0 12px 24px rgba(62, 224, 163, 0.16);
+    }
+    .form-whatsapp {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .form-whatsapp input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(12, 22, 39, 0.96);
+      color: var(--text);
+      font-size: 0.98rem;
+    }
+    .info {
+      text-align: center;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 0.94rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .creator { display: none; margin-top: 16px; }
+    .owner-toggle {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      color: var(--muted);
+      border-radius: 12px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .creator input {
+      width: 100%;
+      margin-bottom: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(12, 22, 39, 0.96);
+      color: var(--text);
+    }
+    .creator button {
+      width: 100%;
+      background: linear-gradient(135deg, var(--danger), var(--danger-dark));
+      color: #fff;
+    }
+    @media (max-width: 900px) {
+      .content { grid-template-columns: 1fr; }
+      .carrito { position: static; }
+    }
+    @media (max-width: 520px) {
+      .catalogo { grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); }
+      .carrito {
+        position: sticky;
+        bottom: 14px;
+        top: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="page-header">
+      <div class="mini-tag">Números disponibles</div>
+      <h1>Catálogo de números</h1>
+      <p class="subtitle">Elige tus números favoritos y confirma tu compra en segundos.</p>
+    </div>
+
+    <div class="topbar">
+      <div class="buscador">
+        <button id="numeroAleatorio" type="button">Elegir al azar</button>
+        <input id="buscarNumero" type="text" maxlength="4" placeholder="Busca un número: 0000" inputmode="numeric" />
+        <button id="irNumero" type="button">Ir</button>
+      </div>
+
+      <button id="abrirPanelCreador" class="owner-toggle" type="button">Acceso del dueño</button>
+
+      <div class="creator" id="creatorPanel">
+        <h2>Panel del creador</h2>
+        <input id="codigoCreador" type="password" placeholder="Código de acceso" autocomplete="off" />
+        <button id="entrarPanelCreador" type="button">Entrar</button>
+      </div>
+    </div>
+
+    <div class="info" id="infoNumero">Número seleccionado: 0000</div>
+
+    <div class="content">
+      <div class="catalogo" id="catalogo"></div>
+
+      <aside class="carrito">
+        <div class="carrito-header">
+          <h2>Carrito</h2>
+          <span class="cart-count" id="carritoCount">0</span>
+        </div>
+
+        <ul class="carrito-lista" id="carritoLista">
+          <li class="carrito-item">No has seleccionado números.</li>
+        </ul>
+
+        <div class="carrito-total">
+          <span>Total</span>
+          <span id="totalCarrito">₡0</span>
+        </div>
+
+        <div class="form-whatsapp">
+          <input id="nombreCliente" type="text" placeholder="Tu nombre" />
+          <input id="telefonoCliente" type="tel" maxlength="20" placeholder="Tu teléfono (opcional)" inputmode="tel" autocomplete="tel" />
+        </div>
+
+        <button id="confirmarCompra" type="button">Confirmar compra por WhatsApp</button>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      precioNumero: 200,
+      sellerWhatsapp: '50687936911',
+      maxNumerosPorPedido: 10,
+      apiBase: '',
+      ownerToken: sessionStorage.getItem('ownerToken') || '',
+      ownerMode: false,
+      carrito: new Set(),
+      numerosVendidos: new Set(),
+      seleccionado: 0
+    };
+
+    const catalogo = document.getElementById('catalogo');
+    const buscarNumero = document.getElementById('buscarNumero');
+    const infoNumero = document.getElementById('infoNumero');
+    const btnIrNumero = document.getElementById('irNumero');
+    const btnNumeroAleatorio = document.getElementById('numeroAleatorio');
+    const carritoLista = document.getElementById('carritoLista');
+    const btnConfirmarCompra = document.getElementById('confirmarCompra');
+    const inputNombreCliente = document.getElementById('nombreCliente');
+    const inputTelefonoCliente = document.getElementById('telefonoCliente');
+    const creatorPanel = document.getElementById('creatorPanel');
+    const inputCodigo = document.getElementById('codigoCreador');
+    const btnAbrirPanelCreador = document.getElementById('abrirPanelCreador');
+    const btnEntrarPanelCreador = document.getElementById('entrarPanelCreador');
+    const carritoCount = document.getElementById('carritoCount');
+    const totalCarrito = document.getElementById('totalCarrito');
+
+    const formatearNumero = (valor) => String(valor).padStart(4, '0');
+    const formatearPrecio = (valor) => `₡${new Intl.NumberFormat('es-CR').format(valor)}`;
+
+    const actualizarSeleccion = (numero) => {
+      state.seleccionado = numero;
+      const valor = formatearNumero(numero);
+      const status = state.numerosVendidos.has(valor) ? ' • Vendido' : '';
+      infoNumero.textContent = `Número seleccionado: ${valor}${status}`;
+      buscarNumero.value = valor;
+
+      document.querySelectorAll('.numero-boton').forEach((boton) => {
+        const esSeleccionado = state.carrito.has(Number(boton.dataset.numero));
+        boton.classList.toggle('selected', esSeleccionado);
+      });
+    };
+
+    const actualizarCarrito = () => {
+      const items = [...state.carrito].sort((a, b) => a - b);
+      carritoCount.textContent = String(items.length);
+      totalCarrito.textContent = formatearPrecio(items.length * state.precioNumero);
+
+      if (!items.length) {
+        carritoLista.innerHTML = '<li class="carrito-item">No has seleccionado números.</li>';
+        return;
+      }
+
+      carritoLista.replaceChildren(...items.map((numero) => {
+        const item = document.createElement('li');
+        item.className = 'carrito-item';
+
+        const numeroTexto = document.createElement('span');
+        numeroTexto.textContent = formatearNumero(numero);
+        const precioTexto = document.createElement('span');
+        precioTexto.textContent = formatearPrecio(state.precioNumero);
+        const quitar = document.createElement('button');
+        quitar.type = 'button';
+        quitar.dataset.quitar = String(numero);
+        quitar.textContent = 'Quitar';
+
+        item.append(numeroTexto, precioTexto, quitar);
+        return item;
+      }));
+
+      document.querySelectorAll('[data-quitar]').forEach((boton) => {
+        boton.addEventListener('click', () => {
+          state.carrito.delete(Number(boton.dataset.quitar));
+          actualizarCarrito();
+          renderCatalogo();
+        });
+      });
+    };
+
+    const agregarAlCarrito = (numero) => {
+      const valor = Number(numero);
+      if (state.numerosVendidos.has(formatearNumero(valor))) return;
+      state.carrito.add(valor);
+      actualizarCarrito();
+      actualizarSeleccion(valor);
+    };
+
+    const toggleNumeroCreador = async (numero) => {
+      if (!state.ownerToken) {
+        alert('Primero valida el código del creador.');
+        return;
+      }
+
+      try {
+        const response = await fetch(apiUrl('/api/owner/toggle-numero'), {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${state.ownerToken}`
+          },
+          body: JSON.stringify({ numero: formatearNumero(numero) })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'No se pudo actualizar el número.');
+
+        await cargarVendidos();
+        renderCatalogo();
+        actualizarCarrito();
+        actualizarSeleccion(numero);
+      } catch (error) {
+        console.error(error);
+        alert(error.message || 'No se pudo actualizar el inventario.');
+      }
+    };
+
+    const renderCatalogo = () => {
+      catalogo.innerHTML = '';
+
+      for (let i = 0; i <= 9999; i++) {
+        const numero = formatearNumero(i);
+        const boton = document.createElement('button');
+        boton.type = 'button';
+        boton.className = 'numero-boton';
+        boton.dataset.numero = numero;
+        boton.innerHTML = `${numero}<span class="precio-numero">${formatearPrecio(state.precioNumero)}</span>`;
+        boton.title = `Número ${numero} - ${formatearPrecio(state.precioNumero)}`;
+
+        if (state.numerosVendidos.has(numero)) {
+          boton.classList.add('vendido');
+        } else if (state.carrito.has(i)) {
+          boton.classList.add('selected');
+        } else {
+          boton.classList.add('disponible');
+        }
+
+        boton.addEventListener('click', async () => {
+          if (state.ownerMode) {
+            await toggleNumeroCreador(i);
+            return;
+          }
+
+          if (state.numerosVendidos.has(numero)) return;
+          actualizarSeleccion(i);
+
+          if (!state.carrito.has(i)) {
+            agregarAlCarrito(i);
+          } else {
+            state.carrito.delete(i);
+            actualizarCarrito();
+            renderCatalogo();
+          }
+        });
+
+        catalogo.appendChild(boton);
+      }
+    };
+
+    const apiUrl = (ruta) => state.apiBase ? new URL(ruta, state.apiBase).toString() : ruta;
+
+    const cargarJsonConFallback = async (rutaApi, rutaFallback) => {
+      try {
+        const response = await fetch(apiUrl(rutaApi), { cache: 'no-store' });
+        if (!response.ok) throw new Error('API no disponible');
+        return await response.json();
+      } catch (error) {
+        if (!rutaFallback) throw error;
+        const fallbackResponse = await fetch(rutaFallback, { cache: 'no-store' });
+        if (!fallbackResponse.ok) throw error;
+        return await fallbackResponse.json();
+      }
+    };
+
+    const cargarConfiguracion = async () => {
+      const data = await cargarJsonConFallback('/api/config', './config.json');
+      state.precioNumero = Number(data.precioNumero) || 200;
+      state.sellerWhatsapp = String(data.sellerWhatsapp || '');
+      state.maxNumerosPorPedido = Number(data.maxNumerosPorPedido) || 10;
+      state.apiBase = String(data.apiBase || '').trim().replace(/\/$/, '');
+    };
+
+    const cargarVendidos = async () => {
+      const data = await cargarJsonConFallback('/api/numeros-vendidos', './numeros-vendidos.json');
+      state.numerosVendidos.clear();
+      (data.numeros || data || []).forEach((numero) => state.numerosVendidos.add(String(numero)));
+    };
+
+    const buscar = () => {
+      const valor = buscarNumero.value.replace(/\D/g, '').slice(0, 4);
+      buscarNumero.value = valor;
+
+      if (!valor) {
+        infoNumero.textContent = 'Número seleccionado: 0000';
+        return;
+      }
+
+      const numero = Number.parseInt(valor, 10) || 0;
+      const numeroFormateado = formatearNumero(numero);
+      const boton = document.querySelector(`[data-numero="${numeroFormateado}"]`);
+
+      if (boton) {
+        boton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        actualizarSeleccion(numero);
+      }
+    };
+
+    const mostrarPanelCreador = () => {
+      creatorPanel.style.display = creatorPanel.style.display === 'block' ? 'none' : 'block';
+      if (creatorPanel.style.display === 'block') {
+        inputCodigo.focus();
+      }
+    };
+
+    const validarCreador = async () => {
+      const codigo = inputCodigo.value.trim();
+      if (!codigo) {
+        alert('Escribe el código del dueño.');
+        return;
+      }
+
+      try {
+        const response = await fetch(apiUrl('/api/owner/validate'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ codigo })
+        });
+
+        const result = await response.json();
+        if (!response.ok) {
+          throw new Error(result.message || 'Código incorrecto.');
+        }
+
+        state.ownerToken = result.token;
+        sessionStorage.setItem('ownerToken', result.token);
+        state.ownerMode = true;
+        creatorPanel.style.display = 'block';
+        creatorPanel.innerHTML = `
+          <h2>Panel del creador</h2>
+          <p style="margin: 0 0 12px; color: #a9bad6;">Toca cualquier número del catálogo para marcarlo o quitarlo como vendido.</p>
+          <button id="salirModoCreadorBtn" type="button">Salir del modo creador</button>
+        `;
+
+        document.getElementById('salirModoCreadorBtn').addEventListener('click', () => {
+          state.ownerMode = false;
+          creatorPanel.style.display = 'none';
+          inputCodigo.value = '';
+        });
+      } catch (error) {
+        console.error(error);
+        alert(error.message || 'Código incorrecto.');
+      }
+    };
+
+    buscarNumero.addEventListener('input', () => {
+      const valor = buscarNumero.value.replace(/\D/g, '').slice(0, 4);
+      if (valor.length === 4) buscar();
+    });
+
+    btnIrNumero.addEventListener('click', buscar);
+
+    btnNumeroAleatorio.addEventListener('click', () => {
+      const cantidad = Number(prompt('¿Cuántos números quieres elegir al azar?', '1'));
+      if (!cantidad || cantidad < 1 || cantidad > 20) {
+        alert('Ingresa un número válido entre 1 y 20.');
+        return;
+      }
+
+      const usados = new Set();
+      for (let i = 0; i < cantidad; i++) {
+        let numero = Math.floor(Math.random() * 10000);
+        while (usados.has(numero) || state.numerosVendidos.has(formatearNumero(numero))) {
+          numero = Math.floor(Math.random() * 10000);
+        }
+        usados.add(numero);
+        agregarAlCarrito(numero);
+      }
+
+      const primerNumero = [...usados][0];
+      const boton = primerNumero !== undefined ? document.querySelector(`[data-numero="${formatearNumero(primerNumero)}"]`) : null;
+      if (boton) boton.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    btnConfirmarCompra.addEventListener('click', async () => {
+      const items = [...state.carrito].sort((a, b) => a - b);
+      if (!items.length) {
+        alert('Primero agrega números al carrito.');
+        return;
+      }
+
+      const nombreCliente = inputNombreCliente.value.trim();
+      if (!nombreCliente) {
+        alert('Escribe tu nombre completo para continuar.');
+        inputNombreCliente.focus();
+        return;
+      }
+
+      const telefonoCliente = inputTelefonoCliente.value.replace(/\D/g, '').slice(0, 20);
+      if (telefonoCliente && telefonoCliente.length < 8) {
+        alert('Si pones teléfono, debe ser válido.');
+        inputTelefonoCliente.focus();
+        return;
+      }
+
+      const numerosTexto = items.map((numero) => formatearNumero(numero)).join(', ');
+      const mensajeWhatsApp = telefonoCliente
+        ? `Hola, soy ${nombreCliente}. Quiero comprar los números: ${numerosTexto}. Mi teléfono es ${telefonoCliente}.`
+        : `Hola, soy ${nombreCliente}. Quiero comprar los números: ${numerosTexto}.`;
+
+      try {
+        const response = await fetch(apiUrl('/api/confirmar-compra'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nombre: nombreCliente,
+            telefono: telefonoCliente,
+            numeros: items.map((n) => formatearNumero(n))
+          })
+        });
+
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Error al enviar la compra');
+
+        alert(result.message || '✅ Tu pedido fue enviado correctamente.');
+        state.carrito.clear();
+        actualizarCarrito();
+        renderCatalogo();
+      } catch (error) {
+        console.error(error);
+        if (state.sellerWhatsapp) {
+          const whatsapp = state.sellerWhatsapp.replace(/\D/g, '');
+          window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(mensajeWhatsApp)}`, '_blank', 'noopener,noreferrer');
+          alert('El servidor no está disponible. Se abrió WhatsApp para completar el pedido.');
+        } else {
+          alert('No se pudo confirmar la compra.');
+        }
+      }
+    });
+
+    btnAbrirPanelCreador.addEventListener('click', mostrarPanelCreador);
+    btnEntrarPanelCreador.addEventListener('click', validarCreador);
+    inputCodigo.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') validarCreador();
+    });
+
+    buscarNumero.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') buscar();
+    });
+
+    (async () => {
+      try {
+        await cargarConfiguracion();
+        await cargarVendidos();
+        renderCatalogo();
+        actualizarCarrito();
+        actualizarSeleccion(0);
+      } catch (error) {
+        console.error(error);
+        alert('No se pudieron cargar los datos del catálogo.');
+      }
+    })();
+  </script>
+</body>
+</html>
